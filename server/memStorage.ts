@@ -1,18 +1,24 @@
-import type { User, Article, InsertUser, InsertArticle } from "@shared/schema";
+import type { User, Article, InsertUser, InsertArticle, SelectWebsiteContent, InsertWebsiteContent } from "@shared/schema";
+import { defaultWebsiteContent } from "@shared/schema";
 import { randomUUID } from "crypto";
 import type { IStorage, ArticleWithAuthor, GetArticlesParams } from "./storage";
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private articles: Map<string, Article>;
+  private websiteContent: Map<string, SelectWebsiteContent>;
 
   constructor() {
     this.users = new Map();
     this.articles = new Map();
+    this.websiteContent = new Map();
     this.seedData();
   }
 
   private async seedData() {
+    // Initialize default website content
+    this.initializeDefaultContent();
+
     // Create default owner user for testing
     const ownerUser: User = {
       id: "owner-1",
@@ -306,5 +312,56 @@ export class MemStorage implements IStorage {
       publishedArticles: allArticles.filter(article => article.status === 'published').length,
       draftArticles: allArticles.filter(article => article.status === 'draft').length,
     };
+  }
+
+  // Website content management methods
+  async initializeDefaultContent(): Promise<void> {
+    for (const content of defaultWebsiteContent) {
+      const id = randomUUID();
+      const websiteContent: SelectWebsiteContent = {
+        id,
+        ...content,
+        updatedAt: new Date(),
+      };
+      const key = `${content.section}.${content.key}`;
+      this.websiteContent.set(key, websiteContent);
+    }
+  }
+
+  async getWebsiteContent(): Promise<SelectWebsiteContent[]> {
+    return Array.from(this.websiteContent.values());
+  }
+
+  async getWebsiteContentBySection(section: string): Promise<SelectWebsiteContent[]> {
+    return Array.from(this.websiteContent.values())
+      .filter(content => content.section === section);
+  }
+
+  async updateWebsiteContent(section: string, key: string, value: string): Promise<SelectWebsiteContent> {
+    const contentKey = `${section}.${key}`;
+    const existing = this.websiteContent.get(contentKey);
+    
+    if (existing) {
+      const updated: SelectWebsiteContent = {
+        ...existing,
+        value,
+        updatedAt: new Date(),
+      };
+      this.websiteContent.set(contentKey, updated);
+      return updated;
+    } else {
+      // Create new content if it doesn't exist
+      const id = randomUUID();
+      const newContent: SelectWebsiteContent = {
+        id,
+        section,
+        key,
+        value,
+        type: 'text',
+        updatedAt: new Date(),
+      };
+      this.websiteContent.set(contentKey, newContent);
+      return newContent;
+    }
   }
 }

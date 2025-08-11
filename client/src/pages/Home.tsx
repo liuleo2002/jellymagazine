@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import ArticleCard from "@/components/ArticleCard";
+import { EditableContent } from "@/components/EditableContent";
 import type { ArticleWithAuthor } from "@shared/schema";
 
 export default function Home() {
@@ -26,12 +27,21 @@ export default function Home() {
         <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-jelly-mint/30 rounded-full animate-pulse"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6 animate-pulse">
-            Welcome to Jelly!
-          </h2>
-          <p className="text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Your go-to online magazine for creative inspiration, colorful stories, and bubbly content that makes you smile! 🎨✨
-          </p>
+          <EditableContent
+            section="hero"
+            contentKey="title"
+            defaultValue="Welcome to Jelly!"
+            as="h2"
+            className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6 animate-pulse"
+          />
+          <EditableContent
+            section="hero"
+            contentKey="subtitle"
+            defaultValue="Your go-to online magazine for creative inspiration, colorful stories, and bubbly content that makes you smile! 🎨✨"
+            as="p"
+            className="text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
+            multiline
+          />
           
           {/* Featured Article Card */}
           {featuredLoading ? (
@@ -113,8 +123,20 @@ export default function Home() {
       <section className="py-20 bg-white/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-800 mb-4">Latest Stories</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Fresh content delivered weekly, bursting with creativity and inspiration!</p>
+            <EditableContent
+              section="articles"
+              contentKey="title"
+              defaultValue="Latest Stories"
+              as="h2"
+              className="text-5xl font-bold text-gray-800 mb-4"
+            />
+            <EditableContent
+              section="articles"
+              contentKey="subtitle"
+              defaultValue="Fresh content delivered weekly, bursting with creativity and inspiration!"
+              as="p"
+              className="text-xl text-gray-600 max-w-2xl mx-auto"
+            />
             
             {/* Decorative Elements */}
             <div className="flex justify-center space-x-4 mt-8">

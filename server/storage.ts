@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Article, type InsertArticle, type ArticleWithAuthor } from "@shared/schema";
+import { type User, type InsertUser, type Article, type InsertArticle, type ArticleWithAuthor, type SelectWebsiteContent, type InsertWebsiteContent } from "@shared/schema";
 import { MemStorage } from "./memStorage";
 
 export interface GetArticlesParams {
@@ -33,6 +33,12 @@ export interface IStorage {
     publishedArticles: number;
     draftArticles: number;
   }>;
+
+  // Website content management
+  getWebsiteContent(): Promise<SelectWebsiteContent[]>;
+  getWebsiteContentBySection(section: string): Promise<SelectWebsiteContent[]>;
+  updateWebsiteContent(section: string, key: string, value: string): Promise<SelectWebsiteContent>;
+  initializeDefaultContent(): Promise<void>;
 }
 
 // Initialize storage with fallback to in-memory

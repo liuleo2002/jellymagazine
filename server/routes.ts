@@ -244,6 +244,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Website content management routes (owner only)
+  app.get("/api/content", requireRole(['owner']), async (req, res) => {
+    try {
+      const content = await storage.getWebsiteContent();
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  app.get("/api/content/:section", requireRole(['owner']), async (req, res) => {
+    try {
+      const content = await storage.getWebsiteContentBySection(req.params.section);
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  app.get("/api/content/:section/:key", async (req, res) => {
+    try {
+      const content = await storage.getWebsiteContentBySection(req.params.section);
+      const item = content.find(c => c.key === req.params.key);
+      
+      if (!item) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  app.put("/api/content/:section/:key", requireRole(['owner']), async (req, res) => {
+    try {
+      const { value } = req.body;
+      const updated = await storage.updateWebsiteContent(
+        req.params.section,
+        req.params.key,
+        value
+      );
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update content" });
+    }
+  });
+
   // Object storage routes
   app.get("/public-objects/:filePath(*)", async (req, res) => {
     const filePath = req.params.filePath;

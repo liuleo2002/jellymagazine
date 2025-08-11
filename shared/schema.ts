@@ -73,6 +73,8 @@ export type Article = typeof articles.$inferSelect;
 export type Login = z.infer<typeof loginSchema>;
 export type Signup = z.infer<typeof signupSchema>;
 export type Contact = z.infer<typeof contactSchema>;
+
+export * from "./websiteContent";
 export type UpdateRole = z.infer<typeof updateRoleSchema>;
 
 export interface ArticleWithAuthor extends Article {
