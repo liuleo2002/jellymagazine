@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 25%, 7.8431%);
+  --card: hsl(180, 6.6667%, 97.0588%);
+  --card-foreground: hsl(210, 25%, 7.8431%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 25%, 7.8431%);
+  --primary: hsl(330, 100%, 71%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(277, 67%, 80%);
+  --secondary-foreground: hsl(0, 0%, 0%);
+  --muted: hsl(240, 1.9608%, 90%);
+  --muted-foreground: hsl(210, 25%, 7.8431%);
+  --accent: hsl(196, 73%, 71%);
+  --accent-foreground: hsl(0, 0%, 0%);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(201.4286, 30.4348%, 90.9804%);
+  --input: hsl(200, 23.0769%, 97.4510%);
+  --ring: hsl(202.8169, 89.1213%, 53.1373%);
+  --radius: 1.5rem;
+  
+  /* Jelly theme colors */
+  --jelly-pink: hsl(330, 100%, 71%);
+  --jelly-purple: hsl(277, 67%, 80%);
+  --jelly-blue: hsl(196, 73%, 71%);
+  --jelly-yellow: hsl(51, 100%, 50%);
+  --jelly-coral: hsl(16, 100%, 66%);
+  --jelly-mint: hsl(120, 90%, 80%);
+  --jelly-cream: hsl(60, 100%, 97%);
+  
+  --font-baloo: 'Baloo 2', cursive;
+}
+
+.dark {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(200, 6.6667%, 91.1765%);
+  --card: hsl(228, 9.8039%, 10%);
+  --card-foreground: hsl(0, 0%, 85.0980%);
+  --popover: hsl(0, 0%, 0%);
+  --popover-foreground: hsl(200, 6.6667%, 91.1765%);
+  --primary: hsl(330, 100%, 71%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(277, 67%, 80%);
+  --secondary-foreground: hsl(0, 0%, 0%);
+  --muted: hsl(0, 0%, 9.4118%);
+  --muted-foreground: hsl(210, 3.3898%, 46.2745%);
+  --accent: hsl(196, 73%, 71%);
+  --accent-foreground: hsl(0, 0%, 0%);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(210, 5.2632%, 14.9020%);
+  --input: hsl(207.6923, 27.6596%, 18.4314%);
+  --ring: hsl(202.8169, 89.1213%, 53.1373%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-baloo antialiased text-foreground min-h-screen;
+    font-family: var(--font-baloo);
+    background: linear-gradient(135deg, var(--jelly-cream), white, hsl(196, 73%, 71%, 0.2));
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-baloo);
+  }
+}
+
+@layer components {
+  .jelly-gradient {
+    background: linear-gradient(135deg, var(--jelly-pink), var(--jelly-purple), var(--jelly-blue));
+  }
+  
+  .jelly-card {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .jelly-card:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+  
+  .jelly-button {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .jelly-button:hover {
+    transform: scale(1.1);
+  }
+  
+  .profile-hover:hover {
+    transform: scale(1.1) rotate(5deg);
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 2s infinite;
+  }
+
+  .animate-wiggle {
+    animation: wiggle 1s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
