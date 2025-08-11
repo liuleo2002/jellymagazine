@@ -1,0 +1,98 @@
+Build a fully functional, responsive web application called Jelly — an online magazine — using React (frontend), Node.js + Express (backend), and Supabase for authentication, database, and file storage. The site must have a fun, bubbly, jelly-like design with playful animations, bright pastel colors, and rounded, squishy UI components.
+
+Core Pages & Features:
+
+Home Page
+
+Display recently published articles in a grid/card layout with title, thumbnail, short excerpt, and author.
+
+Click opens the full article page.
+
+Archive Page
+
+Scrollable/paginated list of all published articles sorted by date.
+
+Article Page
+
+Show full article with title, publish date, author profile link, and content.
+
+Rich text formatting and embedded images.
+
+Editors & Contributors Page
+
+Grid of all authors with avatars, bios, and role tags.
+
+Clicking a profile shows all articles by that person.
+
+Contact Page
+
+Social media links and email contact form to the editor (send via backend API endpoint).
+
+Authentication & Roles:
+
+Use Supabase Auth (email + password).
+
+When signing up, if the master code is entered, assign role = owner.
+
+Roles:
+
+Owner: Can manage editors and site settings.
+
+Editor: Can create, edit, delete articles, and approve contributor drafts.
+
+Contributor: Can write drafts, must be approved by an editor.
+
+Reader: Can only view public content.
+
+Owner can grant/revoke editor role to/from other accounts via an admin dashboard.
+
+Article Management:
+
+Editors/Owner can create, edit, and delete articles using a rich text editor (React Quill).
+
+Contributors can submit drafts for approval.
+
+Images uploaded via Supabase Storage and stored with public URLs.
+
+Database Schema (Supabase):
+
+users: id, name, email, role, bio, profile_picture_url.
+
+articles: id, title, content, image_url, author_id, publish_date, status (draft/published).
+
+Permissions:
+
+Public pages: Home, Archive, Author profiles, Contact.
+
+Restricted pages: Article editor (Editor/Owner only), Draft submissions (Contributor+), Role management (Owner only).
+
+Styling Requirements:
+
+Use Tailwind CSS for styling.
+
+Pastel color palette (pinks, purples, blues, yellows).
+
+Rounded components with hover animations (scale, shadow, color changes).
+
+Large playful typography (Google Fonts: Baloo 2, Fredoka, or Poppins).
+
+Technical Requirements:
+
+React Router for navigation.
+
+Supabase client SDK integrated on the frontend for auth and database reads.
+
+Backend (Node.js + Express) for secure role management endpoints and form submissions.
+
+CSRF protection and JWT validation on backend routes.
+
+Deployment-ready on Replit with .replit config for both frontend and backend.
+
+Folder Structure:
+
+bash
+Copy
+Edit
+/frontend  (React app)
+/backend   (Node.js + Express API)
+/shared    (shared config for Supabase keys, constants)
