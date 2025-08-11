@@ -35,6 +35,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     return res.status(401).json({ message: "Invalid session" });
   }
 
+  // Attach user to request object
+  (req as any).user = user;
   next();
 }
 
@@ -55,6 +57,8 @@ export function requireRole(roles: string[]) {
       return res.status(403).json({ message: "Insufficient permissions" });
     }
 
+    // Attach user to request object
+    (req as any).user = user;
     next();
   };
 }
