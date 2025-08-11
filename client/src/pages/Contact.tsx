@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { EditableContent } from "@/components/EditableContent";
 import { contactSchema, type Contact } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Mail, MapPin, Clock, Send } from "lucide-react";
@@ -61,12 +62,21 @@ export default function ContactPage() {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6">
-            Get In Touch!
-          </h1>
-          <p className="text-2xl text-gray-600 max-w-2xl mx-auto">
-            Have a colorful idea or want to collaborate? We'd love to hear from you!
-          </p>
+          <EditableContent
+            section="contact"
+            contentKey="title"
+            defaultValue="Get In Touch!"
+            as="h1"
+            className="text-6xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6"
+          />
+          <EditableContent
+            section="contact"
+            contentKey="description"
+            defaultValue="Have a colorful idea or want to collaborate? We'd love to hear from you!"
+            as="p"
+            className="text-2xl text-gray-600 max-w-2xl mx-auto"
+            multiline
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

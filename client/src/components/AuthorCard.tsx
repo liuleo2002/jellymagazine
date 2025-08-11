@@ -1,6 +1,8 @@
 import { Link } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { AuthorBioEditor } from "@/components/AuthorBioEditor";
+import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@shared/schema";
 
 interface AuthorCardProps {
@@ -9,6 +11,9 @@ interface AuthorCardProps {
 }
 
 export default function AuthorCard({ author, articleCount = 0 }: AuthorCardProps) {
+  const { user } = useAuth();
+  // Users can edit their own profile, or owners can edit any profile
+  const canEdit = user?.id === author.id || user?.role === 'owner';
   const getRoleBadgeClass = (role: string) => {
     const roleColors = {
       'owner': 'bg-jelly-pink text-white',
@@ -20,7 +25,7 @@ export default function AuthorCard({ author, articleCount = 0 }: AuthorCardProps
   };
 
   return (
-    <div className="text-center group">
+    <div className="text-center group relative">
       <div className="profile-hover mb-6 inline-block">
         <Avatar className="w-32 h-32 border-4 border-jelly-pink shadow-lg">
           <AvatarImage src={author.profilePictureUrl || ""} alt={author.name} />
@@ -61,6 +66,9 @@ export default function AuthorCard({ author, articleCount = 0 }: AuthorCardProps
           <i className="fab fa-dribbble text-xl"></i>
         </a>
       </div>
+      
+      {/* Author Bio Editor */}
+      <AuthorBioEditor author={author} canEdit={canEdit} />
     </div>
   );
 }

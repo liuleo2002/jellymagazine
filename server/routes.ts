@@ -292,6 +292,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Profile management routes
+  app.put("/api/users/:userId/profile", requireAuth, async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const currentUser = req.user;
+      
+      // Users can only edit their own profile, unless they're the owner
+      if (currentUser.id !== userId && currentUser.role !== 'owner') {
+        return res.status(403).json({ error: "Not authorized to edit this profile" });
+      }
+      
+      const { name, bio, profilePictureUrl } = req.body;
+      
+      // Update user profile
+      const updatedUser = await storage.updateUser(userId, {
+        name,
+        bio,
+        profilePictureUrl,
+      });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
+  app.put("/api/profile-images", requireAuth, async (req, res) => {
+    try {
+      const { profileImageURL } = req.body;
+      const userId = req.user.id;
+      
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        profileImageURL,
+        {
+          owner: userId,
+          visibility: "public", // Profile images should be publicly accessible
+        }
+      );
+      
+      res.json({ objectPath });
+    } catch (error) {
+      console.error("Error setting profile image:", error);
+      res.status(500).json({ error: "Failed to process profile image" });
+    }
+  });
+
   // Object storage routes
   app.get("/public-objects/:filePath(*)", async (req, res) => {
     const filePath = req.params.filePath;

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import AuthorCard from "@/components/AuthorCard";
+import { EditableContent } from "@/components/EditableContent";
 import type { User } from "@shared/schema";
 
 export default function Authors() {
@@ -13,12 +14,20 @@ export default function Authors() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6">
-            Meet Our Creative Team
-          </h1>
-          <p className="text-2xl text-gray-600 max-w-2xl mx-auto">
-            The colorful minds behind Jelly's inspiring content!
-          </p>
+          <EditableContent
+            section="authors"
+            contentKey="title"
+            defaultValue="Meet Our Creative Team"
+            as="h1"
+            className="text-6xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6"
+          />
+          <EditableContent
+            section="authors"
+            contentKey="subtitle"
+            defaultValue="The colorful minds behind Jelly's inspiring content!"
+            as="p"
+            className="text-2xl text-gray-600 max-w-2xl mx-auto"
+          />
         </div>
 
         {/* Authors Grid */}

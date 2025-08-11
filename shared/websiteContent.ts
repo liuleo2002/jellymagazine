@@ -47,6 +47,10 @@ export const defaultWebsiteContent: Omit<InsertWebsiteContent, 'id' | 'updatedAt
   // Navigation
   { section: 'nav', key: 'logo', value: 'Jelly', type: 'text' },
   
+  // Authors page
+  { section: 'authors', key: 'title', value: 'Meet Our Authors', type: 'text' },
+  { section: 'authors', key: 'subtitle', value: 'The creative minds behind our colorful content', type: 'text' },
+
   // Contact page
   { section: 'contact', key: 'title', value: 'Get in Touch', type: 'text' },
   { section: 'contact', key: 'description', value: 'We\'d love to hear from you! Send us your thoughts, ideas, or collaboration proposals.', type: 'html' },
