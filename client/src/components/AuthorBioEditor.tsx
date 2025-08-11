@@ -52,14 +52,28 @@ export function AuthorBioEditor({ author, canEdit }: AuthorBioEditorProps) {
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedUser) => {
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: ['/api/authors'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      
+      // Update local profile image state
+      setProfileImageUrl(updatedUser.profilePictureUrl || "");
+      
+      // Reset form with updated data
+      form.reset({
+        name: updatedUser.name,
+        bio: updatedUser.bio || '',
+        profilePictureUrl: updatedUser.profilePictureUrl || '',
+      });
+      
+      // Close dialog and show success
+      setIsOpen(false);
+      
       toast({
         title: "Profile Updated",
         description: "Your profile has been updated successfully!",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/authors'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      setIsOpen(false);
     },
     onError: (error: Error) => {
       toast({
@@ -119,7 +133,12 @@ export function AuthorBioEditor({ author, canEdit }: AuthorBioEditorProps) {
   };
 
   const onSubmit = (data: BioUpdate) => {
-    updateBioMutation.mutate(data);
+    // Include the current profile image URL in the submission
+    const updatedData = {
+      ...data,
+      profilePictureUrl: profileImageUrl || data.profilePictureUrl,
+    };
+    updateBioMutation.mutate(updatedData);
   };
 
   if (!canEdit) {
