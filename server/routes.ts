@@ -103,19 +103,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/articles/recent", async (req, res) => {
-    const articles = await storage.getRecentArticles(6);
+    const articles = await storage.getArticles({
+      status: 'published',
+      sort: 'newest',
+      limit: 6,
+      offset: 0,
+    });
     res.json(articles);
   });
 
   app.get("/api/articles", async (req, res) => {
-    const { search, category, sortBy, page = 1 } = req.query;
+    const { search, category, sort, page = 1 } = req.query;
     const limit = 9;
     const offset = (parseInt(page as string) - 1) * limit;
     
     const articles = await storage.getArticles({
       search: search as string,
       category: category as string,
-      sortBy: sortBy as string,
+      sort: sort as string,
       limit,
       offset,
     });
