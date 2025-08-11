@@ -2,7 +2,7 @@ import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -38,21 +38,6 @@ export default function Editor() {
 
   const isEditing = !!id && id !== 'new';
 
-  // Check permissions
-  if (!user || !['owner', 'editor', 'contributor'].includes(user.role)) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-jelly-cream via-white to-jelly-blue/10 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Access Denied</h1>
-          <p className="text-xl text-gray-600 mb-8">You don't have permission to create or edit articles.</p>
-          <Button onClick={() => setLocation('/')} className="px-8 py-4 bg-gradient-to-r from-jelly-pink to-jelly-purple text-white font-bold rounded-full">
-            Go Home
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: ['/api/articles', id],
     enabled: isEditing,
@@ -65,24 +50,26 @@ export default function Editor() {
       content: "",
       excerpt: "",
       imageUrl: "",
-      authorId: user.id,
+      authorId: user?.id || "",
       category: "",
-      status: user.role === 'contributor' ? 'draft' : 'published',
+      status: user?.role === 'contributor' ? 'draft' : 'published',
     },
   });
 
   // Update form when article loads
-  if (article && isEditing) {
-    form.reset({
-      title: article.title,
-      content: article.content,
-      excerpt: article.excerpt,
-      imageUrl: article.imageUrl || "",
-      authorId: article.authorId,
-      category: article.category || "",
-      status: article.status,
-    });
-  }
+  useEffect(() => {
+    if (article && isEditing) {
+      form.reset({
+        title: article.title,
+        content: article.content,
+        excerpt: article.excerpt,
+        imageUrl: article.imageUrl || "",
+        authorId: article.authorId,
+        category: article.category || "",
+        status: article.status,
+      });
+    }
+  }, [article, isEditing, form]);
 
   const saveArticleMutation = useMutation({
     mutationFn: async (data: InsertArticle) => {
@@ -151,6 +138,21 @@ export default function Editor() {
     }
     setImageUploading(false);
   };
+
+  // Check permissions after all hooks are defined
+  if (!user || !['owner', 'editor', 'contributor'].includes(user.role)) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-jelly-cream via-white to-jelly-blue/10 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Access Denied</h1>
+          <p className="text-xl text-gray-600 mb-8">You don't have permission to create or edit articles.</p>
+          <Button onClick={() => setLocation('/')} className="px-8 py-4 bg-gradient-to-r from-jelly-pink to-jelly-purple text-white font-bold rounded-full">
+            Go Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading && isEditing) {
     return (
