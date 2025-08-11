@@ -280,26 +280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ uploadURL });
   });
 
-  app.put("/api/articles/image", requireAuth, async (req, res) => {
-    if (!req.body.imageUrl) {
-      return res.status(400).json({ error: "imageUrl is required" });
-    }
 
-    const userId = (req.session as any).userId;
-
-    try {
-      const objectStorageService = new ObjectStorageService();
-      const objectPath = objectStorageService.normalizeObjectEntityPath(req.body.imageUrl);
-
-      // For now, just return the normalized path without ACL
-      res.status(200).json({
-        objectPath: objectPath,
-      });
-    } catch (error) {
-      console.error("Error setting article image:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
 
   const httpServer = createServer(app);
   return httpServer;

@@ -124,26 +124,12 @@ export default function Editor() {
       const uploadedFile = result.successful[0];
       const imageUrl = uploadedFile.uploadURL;
       
-      try {
-        // Process the uploaded image
-        const response = await apiRequest('PUT', '/api/articles/image', { imageUrl });
-        const { objectPath } = await response.json();
-        
-        // Use the object path for displaying the image
-        form.setValue('imageUrl', objectPath);
-        toast({
-          title: "Image Uploaded!",
-          description: "Your image has been uploaded successfully.",
-        });
-      } catch (error) {
-        console.error("Upload processing error:", error);
-        // Even if processing fails, we can still use the upload URL
-        form.setValue('imageUrl', imageUrl);
-        toast({
-          title: "Image Uploaded!",
-          description: "Your image has been uploaded successfully.",
-        });
-      }
+      // Use the upload URL directly - it's publicly accessible from Google Cloud Storage
+      form.setValue('imageUrl', imageUrl);
+      toast({
+        title: "Image Uploaded!",
+        description: "Your image has been uploaded successfully.",
+      });
     }
     setImageUploading(false);
   };
