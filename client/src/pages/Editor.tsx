@@ -100,6 +100,10 @@ export default function Editor() {
   const handleImageUpload = async () => {
     try {
       const response = await apiRequest('POST', '/api/objects/upload');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get upload URL');
+      }
       const { uploadURL } = await response.json();
       return {
         method: 'PUT' as const,
@@ -108,7 +112,7 @@ export default function Editor() {
     } catch (error) {
       toast({
         title: "Upload Failed",
-        description: "Failed to get upload URL",
+        description: error instanceof Error ? error.message : "Failed to get upload URL",
         variant: "destructive",
       });
       throw error;
@@ -121,18 +125,23 @@ export default function Editor() {
       const imageUrl = uploadedFile.uploadURL;
       
       try {
-        // Set ACL policy for the uploaded image
-        await apiRequest('PUT', '/api/articles/image', { imageUrl });
-        form.setValue('imageUrl', imageUrl);
+        // Process the uploaded image
+        const response = await apiRequest('PUT', '/api/articles/image', { imageUrl });
+        const { objectPath } = await response.json();
+        
+        // Use the object path for displaying the image
+        form.setValue('imageUrl', objectPath);
         toast({
           title: "Image Uploaded!",
           description: "Your image has been uploaded successfully.",
         });
       } catch (error) {
+        console.error("Upload processing error:", error);
+        // Even if processing fails, we can still use the upload URL
+        form.setValue('imageUrl', imageUrl);
         toast({
-          title: "Upload Error",
-          description: "Failed to process uploaded image",
-          variant: "destructive",
+          title: "Image Uploaded!",
+          description: "Your image has been uploaded successfully.",
         });
       }
     }

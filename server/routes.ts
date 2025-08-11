@@ -291,6 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const objectStorageService = new ObjectStorageService();
       const objectPath = objectStorageService.normalizeObjectEntityPath(req.body.imageUrl);
 
+      // For now, just return the normalized path without ACL
       res.status(200).json({
         objectPath: objectPath,
       });
