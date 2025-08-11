@@ -122,10 +122,21 @@ export default function Editor() {
   const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
     if (result.successful && result.successful.length > 0) {
       const uploadedFile = result.successful[0];
-      const imageUrl = uploadedFile.uploadURL;
+      const uploadUrl = uploadedFile.uploadURL;
       
-      // Use the upload URL directly - it's publicly accessible from Google Cloud Storage
-      form.setValue('imageUrl', imageUrl);
+      // Convert Google Cloud Storage URL to our object server path
+      // Extract the path after the bucket name and convert to our format
+      const bucketPath = "/.private/uploads/";
+      if (uploadUrl.includes(bucketPath)) {
+        const pathAfterBucket = uploadUrl.split(bucketPath)[1];
+        const objectPath = `/objects/uploads/${pathAfterBucket}`;
+        form.setValue('imageUrl', objectPath);
+        console.log('Converted image URL:', uploadUrl, '->', objectPath);
+      } else {
+        // Fallback to original URL
+        form.setValue('imageUrl', uploadUrl);
+      }
+      
       toast({
         title: "Image Uploaded!",
         description: "Your image has been uploaded successfully.",
