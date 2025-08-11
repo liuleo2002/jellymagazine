@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { EditableContent } from "@/components/EditableContent";
 
 export default function Footer() {
   return (
@@ -11,11 +12,22 @@ export default function Footer() {
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center animate-pulse">
                 <i className="fas fa-circle text-white text-2xl"></i>
               </div>
-              <h3 className="text-4xl font-bold">Jelly</h3>
+              <EditableContent
+                section="footer"
+                contentKey="title"
+                defaultValue="Jelly"
+                as="h3"
+                className="text-4xl font-bold"
+              />
             </div>
-            <p className="text-xl text-white/90 mb-6 leading-relaxed max-w-md">
-              Your colorful companion for creative inspiration, design trends, and joyful content that makes the web a more delightful place.
-            </p>
+            <EditableContent
+              section="footer"
+              contentKey="description"
+              defaultValue="Your colorful companion for creative inspiration, design trends, and joyful content that makes the web a more delightful place."
+              as="p"
+              className="text-xl text-white/90 mb-6 leading-relaxed max-w-md"
+              multiline
+            />
             <div className="flex space-x-4">
               <a href="#" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
                 <i className="fab fa-twitter"></i>
@@ -53,9 +65,13 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-white/20 mt-12 pt-8 text-center">
-          <p className="text-white/80">
-            © 2024 Jelly Magazine. Made with 💖 and lots of colorful imagination.
-          </p>
+          <EditableContent
+            section="footer"
+            contentKey="copyright"
+            defaultValue="© 2024 Jelly Magazine. Made with 💖 and lots of colorful imagination."
+            as="p"
+            className="text-white/80"
+          />
         </div>
       </div>
     </footer>

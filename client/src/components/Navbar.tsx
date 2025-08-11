@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import AuthModal from "@/components/AuthModal";
+import { EditableContent } from "@/components/EditableContent";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,9 +46,13 @@ export default function Navbar() {
               <div className="w-12 h-12 bg-gradient-to-r from-jelly-pink to-jelly-purple rounded-full flex items-center justify-center animate-pulse">
                 <i className="fas fa-circle text-white text-2xl"></i>
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-jelly-pink to-jelly-purple bg-clip-text text-transparent">
-                Jelly
-              </h1>
+              <EditableContent
+                section="header"
+                contentKey="logo"
+                defaultValue="Jelly"
+                as="h1"
+                className="text-4xl font-bold bg-gradient-to-r from-jelly-pink to-jelly-purple bg-clip-text text-transparent"
+              />
             </Link>
 
             {/* Navigation */}

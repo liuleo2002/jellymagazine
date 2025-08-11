@@ -296,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/users/:userId/profile", requireAuth, async (req, res) => {
     try {
       const userId = req.params.userId;
-      const currentUser = req.user;
+      const currentUser = (req as any).user;
       
       // Users can only edit their own profile, unless they're the owner
       if (currentUser.id !== userId && currentUser.role !== 'owner') {
@@ -325,7 +325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/profile-images", requireAuth, async (req, res) => {
     try {
       const { profileImageURL } = req.body;
-      const userId = req.user.id;
+      const userId = (req as any).user.id;
       
       const objectStorageService = new ObjectStorageService();
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(

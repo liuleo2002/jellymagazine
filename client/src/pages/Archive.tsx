@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EditableContent } from "@/components/EditableContent";
 import ArticleCard from "@/components/ArticleCard";
 import type { ArticleWithAuthor } from "@shared/schema";
 import { Search, Filter } from "lucide-react";
@@ -39,12 +40,20 @@ export default function Archive() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6">
-            Article Archive
-          </h1>
-          <p className="text-2xl text-gray-600 max-w-2xl mx-auto">
-            Explore our complete collection of colorful stories and creative inspiration
-          </p>
+          <EditableContent
+            section="archive"
+            contentKey="title"
+            defaultValue="Article Archive"
+            as="h1"
+            className="text-6xl font-bold bg-gradient-to-r from-jelly-pink via-jelly-purple to-jelly-blue bg-clip-text text-transparent mb-6"
+          />
+          <EditableContent
+            section="archive"
+            contentKey="subtitle"
+            defaultValue="Explore our complete collection of colorful stories and creative inspiration"
+            as="p"
+            className="text-2xl text-gray-600 max-w-2xl mx-auto"
+          />
         </div>
 
         {/* Filters */}
