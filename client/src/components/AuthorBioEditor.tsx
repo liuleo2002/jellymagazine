@@ -16,9 +16,9 @@ import { apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
 
 const bioUpdateSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  bio: z.string().min(10, "Bio must be at least 10 characters"),
-  profilePictureUrl: z.string().url().optional().or(z.literal("")),
+  name: z.string().min(1, "Name is required"),
+  bio: z.string().min(1, "Bio is required"),
+  profilePictureUrl: z.string().optional(),
 });
 
 type BioUpdate = z.infer<typeof bioUpdateSchema>;
@@ -76,9 +76,10 @@ export function AuthorBioEditor({ author, canEdit }: AuthorBioEditorProps) {
       });
     },
     onError: (error: Error) => {
+      console.error("Profile update error:", error);
       toast({
         title: "Update Failed",
-        description: error.message,
+        description: error.message || "Failed to update profile",
         variant: "destructive",
       });
     },
@@ -136,8 +137,9 @@ export function AuthorBioEditor({ author, canEdit }: AuthorBioEditorProps) {
     // Include the current profile image URL in the submission
     const updatedData = {
       ...data,
-      profilePictureUrl: profileImageUrl || data.profilePictureUrl,
+      profilePictureUrl: profileImageUrl || data.profilePictureUrl || null,
     };
+    console.log("Form submission data:", updatedData);
     updateBioMutation.mutate(updatedData);
   };
 
@@ -232,6 +234,11 @@ export function AuthorBioEditor({ author, canEdit }: AuthorBioEditorProps) {
                 type="submit"
                 disabled={updateBioMutation.isPending}
                 className="flex-1 bg-gradient-to-r from-jelly-pink to-jelly-purple text-white"
+                onClick={() => {
+                  console.log("Save button clicked");
+                  console.log("Form errors:", form.formState.errors);
+                  console.log("Form values:", form.getValues());
+                }}
               >
                 <Save className="h-4 w-4 mr-2" />
                 {updateBioMutation.isPending ? "Saving..." : "Save Profile"}
