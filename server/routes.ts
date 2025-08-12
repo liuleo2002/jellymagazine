@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { getStorage } from "./storage";
 import { setupAuth, requireAuth, requireRole } from "./auth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { 
@@ -16,13 +16,17 @@ import bcrypt from "bcrypt";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication middleware
   await setupAuth(app);
+  
+  // Initialize storage for database connection
+  const storageInstance = await getStorage();
+  console.log("Storage initialized successfully");
 
   // Auth routes
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = loginSchema.parse(req.body);
       
-      const user = await storage.getUserByEmail(email);
+      const user = await storageInstance.getUserByEmail(email);
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -47,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { name, email, password, masterCode } = signupSchema.parse(req.body);
       
-      const existingUser = await storage.getUserByEmail(email);
+      const existingUser = await storageInstance.getUserByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
       }
@@ -57,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check master code for owner role
       const role = masterCode === process.env.MASTER_CODE ? 'owner' : 'reader';
       
-      const user = await storage.createUser({
+      const user = await storageInstance.createUser({
         name,
         email,
         password: hashedPassword,
@@ -77,7 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/me", requireAuth, async (req, res) => {
     const userId = (req.session as any).userId;
-    const user = await storage.getUser(userId);
+    const user = await storageInstance.getUser(userId);
     
     if (!user) {
       return res.status(401).json({ message: "User not found" });
@@ -98,13 +102,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Article routes
   app.get("/api/articles/featured", async (req, res) => {
-    const articles = await storage.getFeaturedArticle();
+    const articles = await storageInstance.getFeaturedArticle();
     res.json(articles);
   });
 
   app.get("/api/articles/recent", async (req, res) => {
     console.log('Getting recent articles');
-    const articles = await storage.getArticles({
+    const articles = await storageInstance.getArticles({
       status: 'published',
       sort: 'newest',
       limit: 6,
@@ -121,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     console.log('Getting articles with params:', { search, category, sort, page, limit, offset });
     
-    const articles = await storage.getArticles({
+    const articles = await storageInstance.getArticles({
       search: search as string,
       category: category as string,
       sort: sort as string,
@@ -135,12 +139,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/articles/all", requireRole(['owner', 'editor']), async (req, res) => {
-    const articles = await storage.getAllArticles();
+    const articles = await storageInstance.getAllArticles();
     res.json(articles);
   });
 
   app.get("/api/articles/:id", async (req, res) => {
-    const article = await storage.getArticleById(req.params.id);
+    const article = await storageInstance.getArticleById(req.params.id);
     if (!article) {
       return res.status(404).json({ message: "Article not found" });
     }
@@ -152,7 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = (req.session as any).userId;
       const data = insertArticleSchema.parse(req.body);
       
-      const article = await storage.createArticle({
+      const article = await storageInstance.createArticle({
         ...data,
         authorId: userId,
       });
@@ -166,8 +170,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/articles/:id", requireAuth, async (req, res) => {
     try {
       const userId = (req.session as any).userId;
-      const user = await storage.getUser(userId);
-      const article = await storage.getArticleById(req.params.id);
+      const user = await storageInstance.getUser(userId);
+      const article = await storageInstance.getArticleById(req.params.id);
       
       if (!article) {
         return res.status(404).json({ message: "Article not found" });
@@ -179,7 +183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const data = insertArticleSchema.parse(req.body);
-      const updatedArticle = await storage.updateArticle(req.params.id, data);
+      const updatedArticle = await storageInstance.updateArticle(req.params.id, data);
       
       res.json(updatedArticle);
     } catch (error) {
@@ -190,8 +194,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/articles/:id", requireAuth, async (req, res) => {
     try {
       const userId = (req.session as any).userId;
-      const user = await storage.getUser(userId);
-      const article = await storage.getArticleById(req.params.id);
+      const user = await storageInstance.getUser(userId);
+      const article = await storageInstance.getArticleById(req.params.id);
       
       if (!article) {
         return res.status(404).json({ message: "Article not found" });
@@ -202,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Permission denied" });
       }
 
-      await storage.deleteArticle(req.params.id);
+      await storageInstance.deleteArticle(req.params.id);
       res.json({ message: "Article deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete article" });
@@ -211,20 +215,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Author routes
   app.get("/api/authors", async (req, res) => {
-    const authors = await storage.getAuthorsWithArticleCount();
+    const authors = await storageInstance.getAuthorsWithArticleCount();
     res.json(authors);
   });
 
   // User management routes
   app.get("/api/users", requireRole(['owner']), async (req, res) => {
-    const users = await storage.getAllUsers();
+    const users = await storageInstance.getAllUsers();
     res.json(users);
   });
 
   app.put("/api/users/role", requireRole(['owner']), async (req, res) => {
     try {
       const { userId, role } = updateRoleSchema.parse(req.body);
-      const updatedUser = await storage.updateUserRole(userId, role);
+      const updatedUser = await storageInstance.updateUserRole(userId, role);
       res.json(updatedUser);
     } catch (error) {
       res.status(400).json({ message: "Invalid request data" });
@@ -233,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Dashboard stats
   app.get("/api/dashboard/stats", requireRole(['owner']), async (req, res) => {
-    const stats = await storage.getDashboardStats();
+    const stats = await storageInstance.getDashboardStats();
     res.json(stats);
   });
 
@@ -254,7 +258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Website content management routes (owner only)
   app.get("/api/content", requireRole(['owner']), async (req, res) => {
     try {
-      const content = await storage.getWebsiteContent();
+      const content = await storageInstance.getWebsiteContent();
       res.json(content);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch content" });
@@ -263,7 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/content/:section", requireRole(['owner']), async (req, res) => {
     try {
-      const content = await storage.getWebsiteContentBySection(req.params.section);
+      const content = await storageInstance.getWebsiteContentBySection(req.params.section);
       res.json(content);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch content" });
@@ -272,7 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/content/:section/:key", async (req, res) => {
     try {
-      const content = await storage.getWebsiteContentBySection(req.params.section);
+      const content = await storageInstance.getWebsiteContentBySection(req.params.section);
       const item = content.find(c => c.key === req.params.key);
       
       if (!item) {
@@ -288,7 +292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/content/:section/:key", requireRole(['owner']), async (req, res) => {
     try {
       const { value } = req.body;
-      const updated = await storage.updateWebsiteContent(
+      const updated = await storageInstance.updateWebsiteContent(
         req.params.section,
         req.params.key,
         value
@@ -313,7 +317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name, bio, profilePictureUrl } = req.body;
       
       // Update user profile
-      const updatedUser = await storage.updateUser(userId, {
+      const updatedUser = await storageInstance.updateUser(userId, {
         name,
         bio,
         profilePictureUrl,

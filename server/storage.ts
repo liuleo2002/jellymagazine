@@ -1,5 +1,6 @@
 import { type User, type InsertUser, type Article, type InsertArticle, type ArticleWithAuthor, type SelectWebsiteContent, type InsertWebsiteContent } from "@shared/schema";
 import { MemStorage } from "./memStorage";
+import { DbStorage } from "./dbStorage";
 
 export interface GetArticlesParams {
   search?: string;
@@ -47,11 +48,22 @@ let storageInstance: IStorage | null = null;
 
 export async function getStorage(): Promise<IStorage> {
   if (!storageInstance) {
-    // For now, use in-memory storage (can be enhanced later for database)
-    storageInstance = new MemStorage();
+    // Use database storage if DATABASE_URL is available, otherwise fallback to memory
+    if (process.env.DATABASE_URL) {
+      try {
+        storageInstance = new DbStorage();
+        console.log("✓ Connected to Supabase database");
+      } catch (error) {
+        console.error("Failed to connect to database, falling back to memory storage:", error);
+        storageInstance = new MemStorage();
+      }
+    } else {
+      console.log("No DATABASE_URL found, using in-memory storage");
+      storageInstance = new MemStorage();
+    }
   }
-  return storageInstance;
+  return storageInstance!;
 }
 
-// Synchronous storage for immediate use
+// Create storage instance
 export const storage = new MemStorage();

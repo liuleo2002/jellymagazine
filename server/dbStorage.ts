@@ -3,7 +3,7 @@ import { getDb } from './db';
 import { users, articles, type User, type Article, type InsertUser, type InsertArticle } from '@shared/schema';
 import type { IStorage, ArticleWithAuthor, GetArticlesParams } from './storage';
 
-export class DatabaseStorage implements IStorage {
+export class DbStorage implements IStorage {
   private db = getDb();
 
   async getUser(id: string): Promise<User | undefined> {
