@@ -1,7 +1,7 @@
 import { eq, desc, sql, like, and, ne } from 'drizzle-orm';
 import { getDb } from './db';
-import { users, articles, type User, type Article, type InsertUser, type InsertArticle } from '@shared/schema';
-import type { IStorage, ArticleWithAuthor, GetArticlesParams } from './storage';
+import { users, articles, websiteContent, type User, type Article, type InsertUser, type InsertArticle, type SelectWebsiteContent, type InsertWebsiteContent, defaultWebsiteContent } from '@shared/schema';
+import type { IStorage, GetArticlesParams } from './storage';
 
 export class DbStorage implements IStorage {
   private db = getDb();
@@ -35,6 +35,16 @@ export class DbStorage implements IStorage {
     return user;
   }
 
+  async updateUser(userId: string, updates: Partial<InsertUser>): Promise<User | undefined> {
+    const [user] = await this.db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return user;
+  }
+
   async getAllUsers(): Promise<User[]> {
     return await this.db.select({
       id: users.id,
@@ -48,7 +58,7 @@ export class DbStorage implements IStorage {
     }).from(users);
   }
 
-  async getArticleById(id: string): Promise<ArticleWithAuthor | undefined> {
+  async getArticleById(id: string): Promise<(Article & { author: User }) | undefined> {
     const result = await this.db
       .select({
         article: articles,
@@ -76,7 +86,7 @@ export class DbStorage implements IStorage {
     };
   }
 
-  async getArticles(params: GetArticlesParams): Promise<ArticleWithAuthor[]> {
+  async getArticles(params: GetArticlesParams): Promise<(Article & { author: User })[]> {
     let query = this.db
       .select({
         article: articles,
@@ -98,7 +108,7 @@ export class DbStorage implements IStorage {
     const conditions = [];
     
     if (params.status) {
-      conditions.push(eq(articles.status, params.status));
+      conditions.push(eq(articles.status, params.status as any));
     }
     
     if (params.category) {
@@ -122,13 +132,13 @@ export class DbStorage implements IStorage {
     // Apply sorting
     switch (params.sort) {
       case 'oldest':
-        query = query.orderBy(articles.publishDate || articles.createdAt);
+        query = query.orderBy(articles.createdAt);
         break;
       case 'title':
         query = query.orderBy(articles.title);
         break;
       default: // newest
-        query = query.orderBy(desc(articles.publishDate || articles.createdAt));
+        query = query.orderBy(desc(articles.createdAt));
     }
 
     // Apply pagination
@@ -181,7 +191,7 @@ export class DbStorage implements IStorage {
     await this.db.delete(articles).where(eq(articles.id, id));
   }
 
-  async getFeaturedArticle(): Promise<ArticleWithAuthor | undefined> {
+  async getFeaturedArticle(): Promise<(Article & { author: User }) | undefined> {
     const result = await this.db
       .select({
         article: articles,
@@ -199,7 +209,7 @@ export class DbStorage implements IStorage {
       .from(articles)
       .leftJoin(users, eq(articles.authorId, users.id))
       .where(eq(articles.status, 'published'))
-      .orderBy(desc(articles.publishDate))
+      .orderBy(desc(articles.createdAt))
       .limit(1);
 
     if (!result[0] || !result[0].author) return undefined;
@@ -213,16 +223,14 @@ export class DbStorage implements IStorage {
   async getAuthorsWithArticleCount(): Promise<(User & { articleCount: number })[]> {
     const result = await this.db
       .select({
-        user: {
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          role: users.role,
-          bio: users.bio,
-          profilePictureUrl: users.profilePictureUrl,
-          createdAt: users.createdAt,
-          password: sql`''`.as('password')
-        },
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        bio: users.bio,
+        profilePictureUrl: users.profilePictureUrl,
+        createdAt: users.createdAt,
+        password: sql`''`.as('password'),
         articleCount: sql<number>`cast(count(${articles.id}) as int)`
       })
       .from(users)
@@ -232,7 +240,14 @@ export class DbStorage implements IStorage {
       .orderBy(desc(sql`count(${articles.id})`));
 
     return result.map(row => ({
-      ...row.user,
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      role: row.role,
+      bio: row.bio,
+      profilePictureUrl: row.profilePictureUrl,
+      createdAt: row.createdAt,
+      password: row.password,
       articleCount: row.articleCount
     }));
   }
@@ -260,5 +275,45 @@ export class DbStorage implements IStorage {
       publishedArticles: publishedArticles.count,
       draftArticles: draftArticles.count,
     };
+  }
+
+  async getWebsiteContent(): Promise<SelectWebsiteContent[]> {
+    return await this.db.select().from(websiteContent).orderBy(websiteContent.section, websiteContent.key);
+  }
+
+  async getWebsiteContentBySection(section: string): Promise<SelectWebsiteContent[]> {
+    return await this.db.select().from(websiteContent).where(eq(websiteContent.section, section));
+  }
+
+  async updateWebsiteContent(section: string, key: string, value: string): Promise<SelectWebsiteContent> {
+    // Try to update existing content
+    const [existing] = await this.db
+      .update(websiteContent)
+      .set({ value, updatedAt: new Date() })
+      .where(and(eq(websiteContent.section, section), eq(websiteContent.key, key)))
+      .returning();
+
+    if (existing) {
+      return existing;
+    }
+
+    // Create new content if it doesn't exist
+    const [newContent] = await this.db
+      .insert(websiteContent)
+      .values({ section, key, value, type: 'text' })
+      .returning();
+
+    return newContent;
+  }
+
+  async initializeDefaultContent(): Promise<void> {
+    // Check if content already exists
+    const existing = await this.db.select().from(websiteContent).limit(1);
+    
+    if (existing.length === 0) {
+      // Insert default content
+      await this.db.insert(websiteContent).values(defaultWebsiteContent);
+      console.log('✅ Default website content initialized');
+    }
   }
 }

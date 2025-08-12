@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Article, type InsertArticle, type ArticleWithAuthor, type SelectWebsiteContent, type InsertWebsiteContent } from "@shared/schema";
+import { type User, type InsertUser, type Article, type InsertArticle, type SelectWebsiteContent, type InsertWebsiteContent } from "@shared/schema";
 import { MemStorage } from "./memStorage";
 import { DbStorage } from "./dbStorage";
 
@@ -20,9 +20,9 @@ export interface IStorage {
   updateUserRole(userId: string, role: string): Promise<User>;
   getAllUsers(): Promise<User[]>;
   
-  getArticleById(id: string): Promise<ArticleWithAuthor | undefined>;
-  getFeaturedArticle(): Promise<ArticleWithAuthor | undefined>;
-  getArticles(params: GetArticlesParams): Promise<ArticleWithAuthor[]>;
+  getArticleById(id: string): Promise<(Article & { author: User }) | undefined>;
+  getFeaturedArticle(): Promise<(Article & { author: User }) | undefined>;
+  getArticles(params: GetArticlesParams): Promise<(Article & { author: User })[]>;
   getAllArticles(): Promise<Article[]>;
   createArticle(article: InsertArticle): Promise<Article>;
   updateArticle(id: string, article: Partial<InsertArticle>): Promise<Article>;
@@ -48,19 +48,9 @@ let storageInstance: IStorage | null = null;
 
 export async function getStorage(): Promise<IStorage> {
   if (!storageInstance) {
-    // Use database storage if DATABASE_URL is available, otherwise fallback to memory
-    if (process.env.DATABASE_URL) {
-      try {
-        storageInstance = new DbStorage();
-        console.log("✓ Connected to Supabase database");
-      } catch (error) {
-        console.error("Failed to connect to database, falling back to memory storage:", error);
-        storageInstance = new MemStorage();
-      }
-    } else {
-      console.log("No DATABASE_URL found, using in-memory storage");
-      storageInstance = new MemStorage();
-    }
+    // For now, use memory storage due to database connection issues
+    console.log("Using in-memory storage");
+    storageInstance = new MemStorage();
   }
   return storageInstance!;
 }

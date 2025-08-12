@@ -74,7 +74,6 @@ export default function Navbar() {
                 className={`font-bold bg-gradient-to-r from-jelly-pink to-jelly-purple bg-clip-text text-transparent transition-all duration-300 group-hover:scale-105 ${
                   isScrolled ? 'text-xl' : 'text-2xl'
                 }`}
-                placeholder="Site Name"
                 multiline={false}
               />
             </Link>
@@ -82,11 +81,9 @@ export default function Navbar() {
             {/* Navigation */}
             <nav className="hidden md:flex space-x-8">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <a className={`relative px-3 py-2 rounded-full transition-all duration-300 hover:bg-jelly-pink/10 hover:scale-110 ${getNavLinkClass(link.href)}`}>
-                    {link.label}
-                    <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-jelly-pink to-jelly-purple transform scale-x-0 transition-transform duration-300 hover:scale-x-100"></span>
-                  </a>
+                <Link key={link.href} href={link.href} className={`relative px-3 py-2 rounded-full transition-all duration-300 hover:bg-jelly-pink/10 hover:scale-110 ${getNavLinkClass(link.href)}`}>
+                  {link.label}
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-jelly-pink to-jelly-purple transform scale-x-0 transition-transform duration-300 hover:scale-x-100"></span>
                 </Link>
               ))}
             </nav>

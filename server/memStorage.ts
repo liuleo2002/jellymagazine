@@ -1,7 +1,7 @@
 import type { User, Article, InsertUser, InsertArticle, SelectWebsiteContent, InsertWebsiteContent } from "@shared/schema";
 import { defaultWebsiteContent } from "@shared/schema";
 import { randomUUID } from "crypto";
-import type { IStorage, ArticleWithAuthor, GetArticlesParams } from "./storage";
+import type { IStorage, GetArticlesParams } from "./storage";
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
@@ -169,7 +169,7 @@ export class MemStorage implements IStorage {
     });
   }
 
-  async getArticleById(id: string): Promise<ArticleWithAuthor | undefined> {
+  async getArticleById(id: string): Promise<(Article & { author: User }) | undefined> {
     const article = this.articles.get(id);
     if (!article) return undefined;
 
@@ -183,7 +183,7 @@ export class MemStorage implements IStorage {
     };
   }
 
-  async getArticles(params: GetArticlesParams): Promise<ArticleWithAuthor[]> {
+  async getArticles(params: GetArticlesParams): Promise<(Article & { author: User })[]> {
     let filteredArticles = Array.from(this.articles.values());
 
     // Apply filters
@@ -222,7 +222,7 @@ export class MemStorage implements IStorage {
     // Apply pagination
     const paginatedArticles = filteredArticles.slice(params.offset, params.offset + params.limit);
 
-    const articlesWithAuthors: ArticleWithAuthor[] = [];
+    const articlesWithAuthors: (Article & { author: User })[] = [];
     for (const article of paginatedArticles) {
       const author = this.users.get(article.authorId);
       if (author) {
@@ -282,7 +282,7 @@ export class MemStorage implements IStorage {
     this.articles.delete(id);
   }
 
-  async getFeaturedArticle(): Promise<ArticleWithAuthor | undefined> {
+  async getFeaturedArticle(): Promise<(Article & { author: User }) | undefined> {
     const publishedArticles = Array.from(this.articles.values())
       .filter(article => article.status === 'published')
       .sort((a, b) => new Date(b.publishDate!).getTime() - new Date(a.publishDate!).getTime());
@@ -336,6 +336,7 @@ export class MemStorage implements IStorage {
       const websiteContent: SelectWebsiteContent = {
         id,
         ...content,
+        type: content.type || 'text',
         updatedAt: new Date(),
       };
       const key = `${content.section}.${content.key}`;
