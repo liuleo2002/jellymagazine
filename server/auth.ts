@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import MemoryStore from "memorystore";
-import { storage } from "./storage";
+import { getStorage } from "./storage";
 
 const MemoryStoreSession = MemoryStore(session);
 
@@ -30,6 +30,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     return res.status(401).json({ message: "Authentication required" });
   }
 
+  const storage = await getStorage();
   const user = await storage.getUser(userId);
   if (!user) {
     return res.status(401).json({ message: "Invalid session" });
@@ -48,6 +49,7 @@ export function requireRole(roles: string[]) {
       return res.status(401).json({ message: "Authentication required" });
     }
 
+    const storage = await getStorage();
     const user = await storage.getUser(userId);
     if (!user) {
       return res.status(401).json({ message: "Invalid session" });
