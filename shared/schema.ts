@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, pgEnum, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -7,7 +7,7 @@ export const roleEnum = pgEnum('role', ['owner', 'editor', 'contributor', 'reade
 export const statusEnum = pgEnum('status', ['draft', 'published']);
 
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
@@ -18,12 +18,12 @@ export const users = pgTable("users", {
 });
 
 export const articles = pgTable("articles", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   content: text("content").notNull(),
   excerpt: text("excerpt").notNull(),
   imageUrl: text("image_url"),
-  authorId: varchar("author_id").references(() => users.id).notNull(),
+  authorId: uuid("author_id").references(() => users.id).notNull(),
   publishDate: timestamp("publish_date").defaultNow(),
   status: statusEnum("status").notNull().default('draft'),
   category: text("category"),

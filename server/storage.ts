@@ -48,9 +48,20 @@ let storageInstance: IStorage | null = null;
 
 export async function getStorage(): Promise<IStorage> {
   if (!storageInstance) {
-    // For now, use memory storage due to database connection issues
-    console.log("Using in-memory storage");
-    storageInstance = new MemStorage();
+    // Use database storage if DATABASE_URL is available, otherwise fallback to memory
+    if (process.env.DATABASE_URL) {
+      try {
+        storageInstance = new DbStorage();
+        await storageInstance.initializeDefaultContent();
+        console.log("✓ Connected to PostgreSQL database");
+      } catch (error) {
+        console.error("Failed to connect to database, falling back to memory storage:", error);
+        storageInstance = new MemStorage();
+      }
+    } else {
+      console.log("No DATABASE_URL found, using in-memory storage");
+      storageInstance = new MemStorage();
+    }
   }
   return storageInstance!;
 }

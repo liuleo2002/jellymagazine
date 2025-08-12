@@ -54,7 +54,7 @@ export class DbStorage implements IStorage {
       bio: users.bio,
       profilePictureUrl: users.profilePictureUrl,
       createdAt: users.createdAt,
-      password: sql`''`.as('password') // Exclude password from results
+      password: sql<string>`''`.as('password') // Exclude password from results
     }).from(users);
   }
 
