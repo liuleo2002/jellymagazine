@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, User, Edit, Settings, LogOut } from "lucide-react";
+import { Menu, User, Edit, Settings, LogOut, Users } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -98,12 +98,20 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     )}
                     {user.role === 'owner' && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/dashboard">
-                          <Settings className="mr-2 h-4 w-4" />
-                          <span>Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href="/dashboard">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/users">
+                            <Users className="mr-2 h-4 w-4" />
+                            <span>Manage Users</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout}>

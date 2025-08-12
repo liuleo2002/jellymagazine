@@ -13,6 +13,7 @@ import Authors from "@/pages/Authors";
 import Contact from "@/pages/Contact";
 import Editor from "@/pages/Editor";
 import Dashboard from "@/pages/Dashboard";
+import UserManagement from "@/pages/UserManagement";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/contact" component={Contact} />
           <Route path="/editor/:id?" component={Editor} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/users" component={UserManagement} />
           <Route component={NotFound} />
         </Switch>
       </main>
