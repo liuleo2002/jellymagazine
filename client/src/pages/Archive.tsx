@@ -15,8 +15,19 @@ export default function Archive() {
   const [sortBy, setSortBy] = useState("newest");
   const [page, setPage] = useState(1);
 
+  const queryParams = new URLSearchParams();
+  if (search) queryParams.append('search', search);
+  if (category !== 'all') queryParams.append('category', category);
+  queryParams.append('sort', sortBy);
+  queryParams.append('page', page.toString());
+
   const { data: articles, isLoading } = useQuery<ArticleWithAuthor[]>({
-    queryKey: ['/api/articles', { search, category, sortBy, page }],
+    queryKey: ['/api/articles', search, category, sortBy, page],
+    queryFn: async () => {
+      const response = await fetch(`/api/articles?${queryParams.toString()}`);
+      if (!response.ok) throw new Error('Failed to fetch articles');
+      return response.json();
+    },
   });
 
   const categories = [

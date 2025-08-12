@@ -103,12 +103,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/articles/recent", async (req, res) => {
+    console.log('Getting recent articles');
     const articles = await storage.getArticles({
       status: 'published',
       sort: 'newest',
       limit: 6,
       offset: 0,
     });
+    console.log('Found recent articles:', articles.length);
     res.json(articles);
   });
 
@@ -117,13 +119,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const limit = 9;
     const offset = (parseInt(page as string) - 1) * limit;
     
+    console.log('Getting articles with params:', { search, category, sort, page, limit, offset });
+    
     const articles = await storage.getArticles({
       search: search as string,
       category: category as string,
       sort: sort as string,
+      status: 'published',
       limit,
       offset,
     });
+    
+    console.log('Found articles:', articles.length);
     res.json(articles);
   });
 
