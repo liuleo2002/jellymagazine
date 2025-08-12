@@ -78,11 +78,11 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 animate-in fade-in duration-500">
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <Users className="h-8 w-8 text-jelly-pink" />
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-jelly-pink to-jelly-purple bg-clip-text text-transparent">
+        <div className="flex items-center gap-3 mb-4 group">
+          <Users className="h-8 w-8 text-jelly-pink float-animation" />
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-jelly-pink to-jelly-purple bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
             User Management
           </h1>
         </div>
@@ -92,10 +92,10 @@ export default function UserManagement() {
       </div>
 
       {/* Search Bar */}
-      <Card className="mb-6">
+      <Card className="mb-6 jelly-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
+            <Search className="h-5 w-5 text-jelly-blue" />
             Search Users
           </CardTitle>
           <CardDescription>
@@ -108,7 +108,7 @@ export default function UserManagement() {
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md"
+            className="max-w-md jelly-input"
           />
         </CardContent>
       </Card>
@@ -132,7 +132,7 @@ export default function UserManagement() {
             </Card>
           ) : (
             filteredUsers.map((u: User) => (
-              <Card key={u.id} className="hover:shadow-md transition-shadow">
+              <Card key={u.id} className="jelly-card group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -143,10 +143,10 @@ export default function UserManagement() {
                             ? u.profilePictureUrl 
                             : u.profilePictureUrl}
                           alt={u.name}
-                          className="w-12 h-12 rounded-full object-cover"
+                          className="w-12 h-12 rounded-full object-cover hover:scale-110 transition-all duration-300 pulse-glow"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-jelly-pink to-jelly-purple flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-jelly-pink to-jelly-purple flex items-center justify-center hover:scale-110 transition-all duration-300 pulse-glow">
                           <span className="text-white font-semibold text-lg">
                             {u.name.charAt(0).toUpperCase()}
                           </span>
@@ -188,8 +188,8 @@ export default function UserManagement() {
                           }}
                           disabled={updateRoleMutation.isPending}
                         >
-                          <SelectTrigger className="w-32">
-                            <Edit className="h-3 w-3 mr-1" />
+                          <SelectTrigger className="w-32 hover:scale-105 transition-all duration-200 bg-gradient-to-r from-jelly-mint/20 to-jelly-blue/20">
+                            <Edit className="h-3 w-3 mr-1 text-jelly-purple" />
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -210,20 +210,23 @@ export default function UserManagement() {
       )}
 
       {/* Stats Summary */}
-      <Card className="mt-8">
+      <Card className="mt-8 jelly-card">
         <CardHeader>
-          <CardTitle>User Statistics</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-jelly-yellow to-jelly-coral"></div>
+            User Statistics
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(roleLabels).map(([role, label]) => {
               const count = users.filter((u: User) => u.role === role).length;
               return (
-                <div key={role} className="text-center">
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div key={role} className="text-center group hover:scale-105 transition-all duration-300">
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-jelly-pink transition-colors">
                     {count}
                   </div>
-                  <div className={`text-sm px-2 py-1 rounded-full inline-block ${roleColors[role as keyof typeof roleColors]}`}>
+                  <div className={`text-sm px-3 py-2 rounded-full inline-block transition-all duration-300 group-hover:shadow-lg ${roleColors[role as keyof typeof roleColors]}`}>
                     {label}{count !== 1 ? 's' : ''}
                   </div>
                 </div>

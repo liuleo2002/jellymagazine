@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,6 +19,16 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [authModal, setAuthModal] = useState<'login' | 'signup' | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -38,20 +48,34 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg shadow-lg border-b-4 border-jelly-pink">
+      <header className={`fixed top-0 w-full z-50 transition-all duration-300 ease-out ${
+        isScrolled 
+          ? 'bg-white/95 backdrop-blur-xl shadow-xl border-b-2 border-jelly-pink/50' 
+          : 'bg-white/90 backdrop-blur-lg shadow-lg border-b-4 border-jelly-pink'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className={`flex items-center justify-between transition-all duration-300 ${
+            isScrolled ? 'h-16' : 'h-20'
+          }`}>
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-jelly-pink to-jelly-purple rounded-full flex items-center justify-center animate-pulse">
-                <i className="fas fa-circle text-white text-2xl"></i>
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className={`bg-gradient-to-br from-jelly-pink to-jelly-purple rounded-2xl flex items-center justify-center shadow-lg transform hover:rotate-12 hover:scale-110 transition-all duration-300 ease-out ${
+                isScrolled ? 'w-10 h-10' : 'w-12 h-12'
+              }`}>
+                <span className={`text-white font-bold transition-all duration-300 ${
+                  isScrolled ? 'text-lg' : 'text-xl'
+                }`}>J</span>
               </div>
               <EditableContent
                 section="header"
                 contentKey="logo"
+                type="text"
                 defaultValue="Jelly"
-                as="h1"
-                className="text-4xl font-bold bg-gradient-to-r from-jelly-pink to-jelly-purple bg-clip-text text-transparent"
+                className={`font-bold bg-gradient-to-r from-jelly-pink to-jelly-purple bg-clip-text text-transparent transition-all duration-300 group-hover:scale-105 ${
+                  isScrolled ? 'text-xl' : 'text-2xl'
+                }`}
+                placeholder="Site Name"
+                multiline={false}
               />
             </Link>
 
@@ -59,7 +83,10 @@ export default function Navbar() {
             <nav className="hidden md:flex space-x-8">
               {navLinks.map((link) => (
                 <Link key={link.href} href={link.href}>
-                  <a className={getNavLinkClass(link.href)}>{link.label}</a>
+                  <a className={`relative px-3 py-2 rounded-full transition-all duration-300 hover:bg-jelly-pink/10 hover:scale-110 ${getNavLinkClass(link.href)}`}>
+                    {link.label}
+                    <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-jelly-pink to-jelly-purple transform scale-x-0 transition-transform duration-300 hover:scale-x-100"></span>
+                  </a>
                 </Link>
               ))}
             </nav>
@@ -124,13 +151,13 @@ export default function Navbar() {
                 <>
                   <Button 
                     onClick={() => setAuthModal('login')}
-                    className="jelly-button px-6 py-3 bg-jelly-pink text-white font-semibold rounded-full hover:bg-jelly-coral shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-jelly-pink to-jelly-coral text-white font-semibold rounded-full hover:scale-105 hover:shadow-xl active:scale-95 transform transition-all duration-200 ease-out"
                   >
                     Sign In
                   </Button>
                   <Button 
                     onClick={() => setAuthModal('signup')}
-                    className="jelly-button px-6 py-3 bg-jelly-purple text-white font-semibold rounded-full hover:bg-jelly-blue shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-jelly-purple to-jelly-blue text-white font-semibold rounded-full hover:scale-105 hover:shadow-xl active:scale-95 transform transition-all duration-200 ease-out"
                   >
                     Sign Up
                   </Button>
@@ -141,10 +168,12 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden p-2 rounded-xl bg-jelly-pink/20 hover:bg-jelly-pink/30 transition-colors"
+                className="md:hidden p-2 rounded-xl bg-jelly-pink/20 hover:bg-jelly-pink/30 hover:scale-110 active:scale-95 transform transition-all duration-200"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                <Menu className="text-jelly-pink text-xl" />
+                <Menu className={`text-jelly-pink transition-all duration-300 ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'} ${
+                  isScrolled ? 'text-lg' : 'text-xl'
+                }`} />
               </Button>
             </div>
           </div>

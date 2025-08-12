@@ -18,9 +18,9 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-jelly-mint/5 to-jelly-blue/5">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pt-20 transition-all duration-300">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/archive" component={Archive} />

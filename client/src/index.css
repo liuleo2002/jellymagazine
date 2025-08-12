@@ -62,12 +62,15 @@
 @layer base {
   * {
     @apply border-border;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply font-baloo antialiased text-foreground min-h-screen;
     font-family: var(--font-baloo);
     background: linear-gradient(135deg, var(--jelly-cream), white, hsl(196, 73%, 71%, 0.2));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -76,59 +79,99 @@
 }
 
 @layer components {
-  .jelly-gradient {
-    background: linear-gradient(135deg, var(--jelly-pink), var(--jelly-purple), var(--jelly-blue));
+  .jelly-button {
+    @apply px-6 py-3 font-semibold rounded-full transform transition-all duration-200 ease-out;
+    @apply hover:scale-105 hover:shadow-xl active:scale-95;
+    @apply bg-gradient-to-r from-jelly-pink to-jelly-coral text-white;
+  }
+  
+  .jelly-button-purple {
+    @apply jelly-button;
+    @apply bg-gradient-to-r from-jelly-purple to-jelly-blue;
+  }
+  
+  .jelly-button-mint {
+    @apply jelly-button;
+    @apply bg-gradient-to-r from-jelly-mint to-jelly-blue text-gray-800;
   }
   
   .jelly-card {
-    @apply transition-all duration-300 ease-out;
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20;
+    @apply hover:shadow-2xl hover:-translate-y-1 transition-all duration-300;
   }
   
-  .jelly-card:hover {
-    transform: scale(1.05) translateY(-5px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  .jelly-input {
+    @apply border-2 border-gray-200 rounded-xl px-4 py-3 transition-all duration-200;
+    @apply focus:border-pink-400 focus:ring-2 focus:ring-pink-100;
   }
   
-  .jelly-button {
-    @apply transition-all duration-300 ease-out;
+  .page-enter {
+    opacity: 0;
+    transform: translateY(20px);
   }
   
-  .jelly-button:hover {
-    transform: scale(1.1);
+  .page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
   }
   
-  .profile-hover:hover {
-    transform: scale(1.1) rotate(5deg);
-    @apply transition-all duration-300 ease-out;
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
   }
-
-  .animate-bounce-slow {
-    animation: bounce 2s infinite;
-  }
-
-  .animate-wiggle {
-    animation: wiggle 1s ease-in-out infinite;
-  }
-
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-}
-
-@keyframes wiggle {
-  0%, 100% {
-    transform: rotate(-3deg);
-  }
-  50% {
-    transform: rotate(3deg);
+  
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
   }
 }
 
 @keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  from {
+    box-shadow: 0 0 20px -5px rgba(236, 72, 153, 0.3);
+  }
+  to {
+    box-shadow: 0 0 30px -5px rgba(236, 72, 153, 0.6);
+  }
+}
+
+@keyframes gradient-shift {
   0%, 100% {
-    transform: translateY(0px);
+    background-position: 0% 50%;
   }
   50% {
-    transform: translateY(-10px);
+    background-position: 100% 50%;
   }
+}
+
+.jelly-pink {
+  color: hsl(var(--jelly-pink));
+}
+
+.jelly-purple {
+  color: hsl(var(--jelly-purple));
+}
+
+.jelly-blue {
+  color: hsl(var(--jelly-blue));
+}
+
+.jelly-yellow {
+  color: hsl(var(--jelly-yellow));
+}
+
+.jelly-coral {
+  color: hsl(var(--jelly-coral));
+}
+
+.jelly-mint {
+  color: hsl(var(--jelly-mint));
+}
+
+.jelly-cream {
+  color: hsl(var(--jelly-cream));
 }

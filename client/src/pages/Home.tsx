@@ -64,12 +64,12 @@ export default function Home() {
               </div>
             </div>
           ) : featuredArticle ? (
-            <div className="jelly-card max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div className="jelly-card max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden group">
               {featuredArticle.imageUrl && (
                 <img 
                   src={featuredArticle.imageUrl} 
                   alt={featuredArticle.title}
-                  className="w-full h-96 object-cover"
+                  className="w-full h-96 object-cover group-hover:scale-105 transition-all duration-500"
                 />
               )}
               
